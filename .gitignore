@@ -1,0 +1,9 @@
+MoreShipUpgrades/bin/
+MoreShipUpgrades/assem/
+MoreShipUpgrades/obj/
+MoreShipUpgrades/Properties/
+/.vs/
+.csproj
+.csproj.user
+NetcodePatcher/
+**.user

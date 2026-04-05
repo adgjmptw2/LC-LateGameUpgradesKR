@@ -1,0 +1,114 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyTitle>MoreShipUpgrades</AssemblyTitle>
+    <Product>MoreShipUpgrades</Product>
+    <Copyright>Copyright ©  2023</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <LangVersion>latest</LangVersion>
+	<NetcodePatcherNoOverwrite>true</NetcodePatcherNoOverwrite>
+	<NetcodePatcherDisableParallel>true</NetcodePatcherDisableParallel>
+	  <RestoreAdditionalProjectSources>
+		  https://api.nuget.org/v3/index.json;
+		  https://nuget.bepinex.dev/v3/index.json;
+		  https://nuget.samboy.dev/v3/index.json;
+	  </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="Evaisa.LethalLib" Version="1.2.0" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" PrivateAssets="all" IncludeAssets="compile" ExcludeAssets="runtime" />
+	<PackageReference Include="TeamXiaolan.DawnLib" Version="0.9.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Managers\InfoStrings.json" />
+    <None Remove="Managers\UpgradeBus.cs~RF47f1cff.TMP" />
+    <None Remove="Misc\InfoStrings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp" Publicize="true">
+      <HintPath>$(LC_PATH)\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(LC_PATH)\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="LethalCompanyInputUtils">
+      <HintPath>$(LC_PLUGIN_PATH)\Rune580-LethalCompany_InputUtils\LethalCompanyInputUtils\LethalCompanyInputUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="com.sigurd.csync">
+      <HintPath>$(LC_PLUGIN_PATH)\Sigurd-CSync\CSync\com.sigurd.csync.dll</HintPath>
+    </Reference>
+    <Reference Include="lethallevelloader">
+      <HintPath>$(LC_PLUGIN_PATH)\IAmBatby-LethalLevelLoader\LethalLevelLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="InteractiveTerminalAPI">
+      <HintPath>$(LC_PLUGIN_PATH)\WhiteSpike-Interactive_Terminal_API\InteractiveTerminalAPI\InteractiveTerminalAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(LC_PATH)\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Runtime" Publicize="true">
+      <HintPath>$(LC_PATH)\Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(LC_PATH)\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(LC_PATH)\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>$(LC_PATH)\Unity.InputSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="CustomItemBehaviourLibrary">
+      <Publicize>true</Publicize>
+      <HintPath>$(LC_PLUGIN_PATH)\WhiteSpike-CustomItemBehaviourLibrary\CustomItemBehaviourLibrary\CustomItemBehaviourLibrary.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="GoodItemScan">
+      <HintPath>$(LC_PLUGIN_PATH)\TestAccount666-GoodItemScan\GoodItemScan.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Oxygen">
+      <Publicize>true</Publicize>
+      <HintPath>$(LC_PLUGIN_PATH)\consequential-Oxygen\Oxygen.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="LCVR">
+      <Publicize>true</Publicize>
+      <HintPath>$(LC_PLUGIN_PATH)\DaXcess-LethalCompanyVR\LCVR\LCVR.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BrutalCompanyMinus" Publicize="true">
+      <HintPath>$(LC_PLUGIN_PATH)\SoftDiamond-BrutalCompanyMinusExtraReborn\BrutalCompanyMinus.dll</HintPath>
+    </Reference>
+    <Reference Include="LethalConstellations">
+      <Publicize>true</Publicize>
+      <HintPath>$(LC_PLUGIN_PATH)\darmuh-LethalConstellations\LethalConstellations.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="com.github.zehsteam.ToilHead">
+      <Publicize>true</Publicize>
+      <HintPath>$(LC_PLUGIN_PATH)\Zehs-Toilhead\com.github.zehsteam.ToilHead.dll</HintPath>
+    </Reference>
+    <Reference Include="MissileTurret">
+      <Publicize>true</Publicize>
+      <HintPath>$(LC_PLUGIN_PATH)\HQ_Team-MissileTurretsFork\MissileTurret.dll</HintPath>
+    </Reference>
+	  <Reference Include="DunGen">
+		  <Publicize>true</Publicize>
+		  <HintPath>$(LC_PATH)\DunGen.dll</HintPath>
+	  </Reference>
+    
+  </ItemGroup>
+  <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
+    <Exec Command="netcode-patch -uv 2022.3.62 -nv 1.12.0 -tv 1.0.0 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(LC_PLUGIN_DIR)" />
+  </Target>
+</Project>

@@ -1,0 +1,141 @@
+﻿using GameNetcodeStuff;
+using MoreShipUpgrades.Managers;
+using MoreShipUpgrades.Misc;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Netcode;
+using UnityEngine;
+
+namespace MoreShipUpgrades.UpgradeComponents.Items.Contracts.Extraction
+{
+    internal class ExtractPlayerScript : NetworkBehaviour
+    {
+        AudioSource audio;
+        PhysicsProp prop;
+
+        internal static readonly Dictionary<string, AudioClip[]> clipDict = new Dictionary<string, AudioClip[]>();
+
+        bool hurtState;
+        InteractTrigger trig;
+
+        Animator anim;
+
+        void Start()
+        {
+            prop = GetComponent<PhysicsProp>();
+            GetComponent<ScrapValueSyncer>().SetScrapValue(UpgradeBus.Instance.PluginConfiguration.ContractsConfiguration.ExtractionConfiguration.RewardValue.Value + (int)(TimeOfDay.Instance.profitQuota * Mathf.Clamp(UpgradeBus.Instance.PluginConfiguration.ContractsConfiguration.RewardQuotaMultiplier.Value / 100f, 0f, 1f)));
+
+
+            audio = GetComponent<AudioSource>();
+            trig = GetComponentInChildren<InteractTrigger>();
+            trig.onInteract.AddListener(InteractComplete);
+            anim = GetComponent<Animator>();
+            if (IsHost)
+            {
+                StartCoroutine(AudioStream());
+            }
+        }
+
+        void Update()
+        {
+            if (prop.isHeld) anim.SetInteger("holdStatus", 1);
+            else anim.SetInteger("holdStatus", 0);
+            if (hurtState) return;
+            trig.interactable = EvalMedKit();
+        }
+
+        bool EvalMedKit()
+        {
+            PlayerControllerB player = GameNetworkManager.Instance.localPlayerController;
+            if (player == null)
+            {
+                return false;
+            }
+            if (player.currentlyHeldObjectServer == null)
+            {
+                return false;
+            }
+            if (player.currentlyHeldObjectServer.itemProperties.itemName == "Medic Bag") return true;
+            else return false;
+        }
+
+        void InteractComplete(PlayerControllerB player)
+        {
+            if (IsHost || IsServer) HealScavClientRpc();
+            else ReqHealScavServerRpc();
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        void ReqHealScavServerRpc()
+        {
+            HealScavClientRpc();
+        }
+
+        [ClientRpc]
+        void HealScavClientRpc()
+        {
+            HealScavenger();
+        }
+
+        void HealScavenger()
+        {
+            trig.GetComponent<BoxCollider>().enabled = false;
+            audio.PlayOneShot(clipDict["heal"][0], UpgradeBus.Instance.PluginConfiguration.ContractsConfiguration.ExtractionConfiguration.ScavengerVolume.Value);
+            anim.SetTrigger("heal");
+            hurtState = false;
+            StartCoroutine(WaitForHealAnim());
+            GetComponent<PhysicsProp>().enabled = true;
+        }
+
+        private IEnumerator WaitForHealAnim()
+        {
+            yield return new WaitForSeconds(1f);
+            GetComponent<BoxCollider>().enabled = true;
+        }
+
+        private IEnumerator AudioStream()
+        {
+            float TimeToWait = Random.Range(25f, 45f);
+            if (prop.isInShipRoom) TimeToWait *= 3f;
+            yield return new WaitForSeconds(TimeToWait);
+            string soundType;
+            if (prop.isHeld)
+            {
+                soundType = "held";
+            }
+            else if (prop.isInShipRoom)
+            {
+                soundType = "safe";
+            }
+            else
+            {
+                soundType = "lost";
+            }
+            PlayAudioClientRpc(Random.Range(0, clipDict[soundType].Length), "lost");
+            StartCoroutine(AudioStream());
+        }
+
+        [ClientRpc]
+        void PlayAudioClientRpc(int index, string soundType)
+        {
+            PlayAudioLocal(index, soundType);
+        }
+
+        void PlayAudioLocal(int index, string soundType)
+        {
+            audio.PlayOneShot(clipDict[soundType][index], UpgradeBus.Instance.PluginConfiguration.ContractsConfiguration.ExtractionConfiguration.ScavengerVolume.Value);
+            RoundManager.Instance.PlayAudibleNoise(transform.position, 30f, 0.9f, 0, prop.isInShipRoom, 5);
+        }
+
+        internal void MakeScavengerGrabbable()
+        {
+            trig = GetComponentInChildren<InteractTrigger>();
+            trig.GetComponent<BoxCollider>().enabled = false;
+            anim = GetComponent<Animator>();
+            anim.SetTrigger("heal");
+            hurtState = false;
+            StartCoroutine(WaitForHealAnim());
+            GetComponent<PhysicsProp>().enabled = true;
+        }
+    }
+}
